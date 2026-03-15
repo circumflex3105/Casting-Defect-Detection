@@ -53,4 +53,8 @@ To help improve the preprocessing pipeline, a visualization script is provided i
 It simply creates a side-by-side comparison of the raw and preprocessed images, saving the output to `data/preprocessing/visualization`.
 
 **Note:** The visualization script will only **merge** the original and preprocessed image, it will not apply the preprocessing steps itself.
-Make sure to run the preprocessing pipeline first to generate the preprocessed images before running the visualization script
+Make sure to run the preprocessing pipeline first to generate the preprocessed images before running the visualization script.
+
+The following image shows an example of the side-by-side image comparison of the original (left) and preprocessed (right):
+
+![Visualization Example](assets/preprocessing_visualization.jpeg)
