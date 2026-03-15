@@ -3,9 +3,14 @@ import cv2
 import numpy as np
 
 PREPROCESSED_DATA_DIRECTORY = "data/preprocessed"
-BLUR_KERNEL_SIZE = (5, 5)
-MORPHOLOGY_KERNEL_SIZE = (5, 5)
-MORPHOLOGY_ITERATIONS = 2
+BLUR_KERNEL_SIZE = (7, 7)
+CANNY_THRESHOLD_LOWER = 20
+CANNY_THRESHOLD_UPPER = 80
+DILATION_KERNEL_SIZE = (11, 11)
+DILATION_ITERATIONS = 3
+WHITE_PIXEL_VALUE = 255
+MINIMUM_POINTS_FOR_ELLIPSE = 5
+ELLIPSE_MARGIN_OFFSET = 10
 
 def get_all_image_paths(directory):
   image_paths = []
@@ -15,25 +20,41 @@ def get_all_image_paths(directory):
         image_paths.append(os.path.join(root, file_name))
   return image_paths
 
-def generate_otsu_mask(image):
-  _, binary_mask = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-  return binary_mask
-
-def refine_mask_morphology(mask, kernel_size, iterations):
-  kernel = np.ones(kernel_size, np.uint8)
-  closed_mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=iterations)
-  opened_mask = cv2.morphologyEx(closed_mask, cv2.MORPH_OPEN, kernel, iterations=iterations)
-  return opened_mask
+def generate_elliptical_mask(image):
+  blurred_image = cv2.GaussianBlur(image, BLUR_KERNEL_SIZE, 0)
+  edges = cv2.Canny(blurred_image, CANNY_THRESHOLD_LOWER, CANNY_THRESHOLD_UPPER)
+  
+  dilation_kernel = np.ones(DILATION_KERNEL_SIZE, np.uint8)
+  dilated_edges = cv2.dilate(edges, dilation_kernel, iterations=DILATION_ITERATIONS)
+  
+  contours, _ = cv2.findContours(dilated_edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+  
+  silhouette_mask = np.zeros_like(image)
+  if contours:
+    largest_contour = max(contours, key=lambda contour: cv2.arcLength(contour, closed=False))
+    if len(largest_contour) >= MINIMUM_POINTS_FOR_ELLIPSE:
+      center, axes, angle = cv2.fitEllipse(largest_contour)
+      
+      adjusted_axes = (
+        max(0.0, axes[0] - ELLIPSE_MARGIN_OFFSET),
+        max(0.0, axes[1] - ELLIPSE_MARGIN_OFFSET)
+      )
+      
+      adjusted_ellipse = (center, adjusted_axes, angle)
+      cv2.ellipse(silhouette_mask, adjusted_ellipse, WHITE_PIXEL_VALUE, thickness=cv2.FILLED)
+      
+  return silhouette_mask
 
 def extract_mask():
   image_paths = get_all_image_paths(PREPROCESSED_DATA_DIRECTORY)
   
   for image_path in image_paths:
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    blurred_image = cv2.GaussianBlur(image, BLUR_KERNEL_SIZE, 0)
-    raw_mask = generate_otsu_mask(blurred_image)
-    refined_mask = refine_mask_morphology(raw_mask, MORPHOLOGY_KERNEL_SIZE, MORPHOLOGY_ITERATIONS)
-    masked_image = cv2.bitwise_and(image, image, refined_mask)
+    if image is None:
+      continue
+      
+    elliptical_mask = generate_elliptical_mask(image)
+    masked_image = cv2.bitwise_and(image, image, mask=elliptical_mask)
     
     cv2.imwrite(image_path, masked_image)
 
