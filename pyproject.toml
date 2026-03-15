@@ -1,0 +1,7 @@
+[project]
+name = "casting-defect-detection"
+version = "0.1.0"
+description = "This project uses an industrial casting product image dataset to train a deep learning model."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
