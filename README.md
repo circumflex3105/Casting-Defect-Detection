@@ -5,6 +5,10 @@ It compares the test results of a model trained on the raw dataset against one t
 
 ## Prerequisites
 
+- Python 3.12+
+
+## Setup
+
 ### 1. Install `uv`
 
 This project uses `uv` as the dependency manager.
@@ -33,3 +37,20 @@ data/
 │       ├── cast_ok_0_35.jpeg
 │       └── ...
 ```
+
+## Preprocessing
+
+One of the main goals of this project is to compare the performance of a model trained on the raw dataset against one trained on a preprocessed version of the dataset.
+The preprocessing pipeline is implemented in `src/preprocessing` and consists of the following steps:
+
+1. **Dataset Split**: The dataset is shuffeled and split into training, validation, and test sets with a ratio of 70:15:15.
+2. **Apply CLAHE**: Contrast Limited Adaptive Histogram Equalization (CLAHE) is applied to enhance the contrast of the images.
+3. **Mask Extraction**: A mask is generated for each image to isolate the region of interest. Initial experiments with otsu's thresholding and simple canny edge detection did not yield satisfactory results, so a custom mask with elliptical shape is created based on the known shape of the casting products in the images.
+
+### Visualization
+
+To help improve the preprocessing pipeline, a visualization script is provided in `src/visualization/visualize_preprocessing.py`.
+It simply creates a side-by-side comparison of the raw and preprocessed images, saving the output to `data/preprocessing/visualization`.
+
+**Note:** The visualization script will only **merge** the original and preprocessed image, it will not apply the preprocessing steps itself.
+Make sure to run the preprocessing pipeline first to generate the preprocessed images before running the visualization script
