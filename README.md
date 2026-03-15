@@ -50,7 +50,7 @@ The preprocessing pipeline is implemented in `src/preprocessing` and consists of
 ### Visualization
 
 To help improve the preprocessing pipeline, a visualization script is provided in `src/visualization/visualize_preprocessing.py`.
-It simply creates a side-by-side comparison of the raw and preprocessed images, saving the output to `data/preprocessing/visualization`.
+It simply creates a side-by-side comparison of the raw and preprocessed images, saving the output to `data/visualization`.
 
 **Note:** The visualization script will only **merge** the original and preprocessed image, it will not apply the preprocessing steps itself.
 Make sure to run the preprocessing pipeline first to generate the preprocessed images before running the visualization script.

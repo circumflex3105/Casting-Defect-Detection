@@ -4,7 +4,7 @@ from pathlib import Path
 
 RAW_DATA_DIRECTORY = "data/raw"
 PREPROCESSED_DATA_DIRECTORY = "data/preprocessed"
-VISUALIZATION_DATA_DIRECTORY = "data/preprocessed/visualization"
+VISUALIZATION_DATA_DIRECTORY = "data/visualization"
 
 def get_relative_image_paths(base_directory):
   relative_paths = []
