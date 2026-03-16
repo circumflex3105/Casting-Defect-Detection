@@ -6,21 +6,24 @@ It compares the test results of a model trained on the raw dataset against one t
 ## Prerequisites
 
 - Python 3.12+
+- [uv dependency manager](https://docs.astral.sh/uv/getting-started/installation/)
 
-## Setup
+## Installation
 
-### 1. Install `uv`
-
-This project uses `uv` as the dependency manager.
-You can install it following the instructions in the [uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
-
-The most common way to install `uv` is via curl:
+### 1. Clone the Repository
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+git clone https://github.com/circumflex3105/Casting-Defect-Detection.git
+cd Casting-Defect-Detection
 ```
 
-### 2. Download the Dataset
+### 2. Install Dependencies
+
+```bash
+uv sync
+```
+
+### 3. Setup Dataset
 
 Download the [casting product image data for quality inspection](https://www.kaggle.com/datasets/ravirajsinh45/real-life-industrial-dataset-of-casting-product) Dataset from Kaggle.
 Extract the downloaded archive, navigate into `archive/casting_512x512/casting_512x512` and place the two directories `def_front` and `ok_front` into `data/raw` in the project root.
@@ -36,6 +39,22 @@ data/
 │   └── ok_front/
 │       ├── cast_ok_0_35.jpeg
 │       └── ...
+```
+
+## How to Run
+
+The project has a run script that executes the entire pipeline, including dataset splitting, training and evaluation.
+
+```bash
+uv run python run.py
+```
+
+To use preprocessing, add the `--use-preprocessed` flag.
+
+If you want to go through the pipeline step by step, you can run the individual modules in `src/preprocessing`, `src/model/train.py` and `src/evaluation/metrics.py` directly, for example:
+
+```bash
+uv run python -m src.preprocessing.generate_splits
 ```
 
 ## Preprocessing
