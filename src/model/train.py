@@ -6,8 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 from pathlib import Path
 
-from dataset import create_data_loader
-from resnet import initialize_resnet_classifier
+from src.model.dataset import create_data_loader
+from src.model.resnet import initialize_resnet_classifier
+from src.utils.utils import get_computation_device
 
 DEFAULT_EPOCH_COUNT = 10
 DEFAULT_BATCH_SIZE = 32
@@ -26,13 +27,6 @@ def parse_command_line_arguments():
   parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
   parser.add_argument("--learning-rate", type=float, default=DEFAULT_LEARNING_RATE)
   return parser.parse_args()
-
-def get_computation_device():
-  if torch.cuda.is_available():
-    return torch.device("cuda")
-  if torch.backends.mps.is_available():
-    return torch.device("mps")
-  return torch.device("cpu")
 
 def create_loss_function():
   return nn.CrossEntropyLoss()
